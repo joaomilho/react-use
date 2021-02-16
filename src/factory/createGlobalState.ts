@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { IHookStateInitAction, IHookStateSetAction } from '../misc/hookState';
+import { IHookStateInitAction, IHookStateSetAction, resolveHookState } from '../misc/hookState';
 import useEffectOnce from '../useEffectOnce';
 import useIsomorphicLayoutEffect from '../useIsomorphicLayoutEffect';
 
@@ -19,8 +19,7 @@ export function createGlobalState<S>(initialState?: S) {
   } = {
     state: initialState instanceof Function ? initialState() : initialState,
     setState(stateOrFn: IHookStateSetAction<S>) {
-      store.state =
-        stateOrFn instanceof Function ? stateOrFn(this.state || (initialState as S)) : stateOrFn;
+      store.state = resolveHookState(stateOrFn, store.state);
       store.setters.forEach((setter) => setter(store.state));
     },
     setters: [],
